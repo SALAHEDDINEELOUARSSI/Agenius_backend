@@ -1,0 +1,92 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+ext {
+	springCloudVersion = "2024.0.1"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'dev.langchain4j:langchain4j-spring-boot-starter:1.0.0-beta2'
+	implementation 'dev.langchain4j:langchain4j-reactor:1.0.0-beta2'
+	implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:1.0.0-beta2'
+	implementation 'dev.langchain4j:langchain4j-document-parser-apache-pdfbox:1.0.0-beta2'
+	implementation 'io.netty:netty-all:4.1.118.Final'
+	implementation 'dev.langchain4j:langchain4j-google-ai-gemini:1.0.0-beta2'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+	implementation 'dev.langchain4j:langchain4j-ollama:1.0.0-beta2'
+	implementation 'dev.langchain4j:langchain4j-github-models:1.0.0-beta2'
+	implementation 'dev.langchain4j:langchain4j-easy-rag:1.0.0-beta2'
+
+	//mailing
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'com.auth0:java-jwt:4.4.0'
+	implementation 'net.sourceforge.tess4j:tess4j:5.14.0'
+	implementation 'org.apache.pdfbox:pdfbox:3.0.4'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'dev.langchain4j:langchain4j-core:1.0.0-beta2'
+	implementation 'dev.langchain4j:langchain4j-pgvector:1.0.0-beta2'
+	implementation 'dev.langchain4j:langchain4j-document-parser-apache-pdfbox:1.0.0-beta2'
+	implementation 'org.apache.pdfbox:pdfbox:2.0.29' // <- force compatible version
+	implementation 'org.apache.pdfbox:fontbox:2.0.29' // ← très important !
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	 implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation("org.springframework.boot:spring-boot-starter-security")
+
+	// OAuth2 client
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+// JWT avec Auth0
+	implementation 'com.auth0:java-jwt:4.4.0'
+
+// JWT avec JJWT (JSON Web Token)
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Utilise Jackson comme sérialiseur
+	//rabbitmq
+	implementation 'com.rabbitmq:amqp-client:5.25.0'
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	
+
+}
+dependencies {
+	compileOnly 'org.projectlombok:lombok:1.18.30'
+	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+	}
+}
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

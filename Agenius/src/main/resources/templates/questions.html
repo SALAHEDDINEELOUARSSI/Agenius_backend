@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="'Questions pour le poste : ' + ${poste}">Questions pour le poste</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            background: #8e44ad;
+            color: white;
+            padding: 15px;
+            font-size: 1.8rem;
+        }
+
+        form {
+            display: flex;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 25%;
+        }
+
+        .main-content {
+            width: 75%;
+        }
+
+        .form-group {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        #navQuestions {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #navQuestions li {
+            background-color: #f1e6f6;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        #navQuestions li:hover {
+            background-color: #ecdaf2;
+            border-color: #8e44ad;
+        }
+
+        #navQuestions li.active {
+            background-color: #e3c6f0;
+            font-weight: bold;
+        }
+
+        #navQuestions li.locked {
+            pointer-events: none;
+            opacity: 0.6;
+            background-color: #ccc;
+            border-color: #999;
+            cursor: not-allowed;
+        }
+
+        #countdown-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 4px solid #8e44ad;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #8e44ad;
+        }
+
+        .timer-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .circle-timer {
+            width: 70px;
+            height: 70px;
+            margin: auto;
+            border: 5px solid #8e44ad;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e44ad;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .timer-label {
+            margin-top: 8px;
+            font-size: 0.9rem;
+              color: #555;
+        }
+
+
+        .question-container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+        }
+
+        .question-container p {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li label {
+            display: block;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f4f4f4;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        input[type="radio"]:checked + span {
+            font-weight: bold;
+            color: #8e44ad;
+        }
+
+        .submit-btn {
+            padding: 10px 20px;
+            background: #8e44ad;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #732d91;
+        }
+
+        @media screen and (max-width: 768px) {
+            form {
+                flex-direction: column;
+            }
+
+            .sidebar,
+            .main-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<h1>Test for the position : <span th:text="${poste}">Poste</span></h1>
+<form id="quizForm" th:attr="data-total=${questions.size()}" th:action="@{'/submit-answers/' + ${poste}}" method="POST">
+    <div class="sidebar">
+        <!-- EMAIL en haut -->
+        <div class="form-group">
+
+            <p>Email : <strong th:text="${email}"></strong></p>
+            <input type="hidden" name="email" th:value="${email}" />
+            <input type="hidden" name="phone" th:value="${phone}" />
+
+
+        </div>
+
+        <!-- TIMER circulaire violet -->
+        <div class="form-group timer-box">
+            <div class="circle-timer">
+                <span id="countdown">2:00</span>
+            </div>
+            <div class="timer-label">Time Left</div>
+        </div>
+
+        <!-- LISTE DES QUESTIONS -->
+        <h3 style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleQuestions()">
+            Questions
+            <span id="toggle-icon" style="font-size: 1.2rem;">˄</span>
+        </h3>
+
+        <ul id="navQuestions">
+            <li th:each="question, stat : ${questions}"
+                th:id="'nav-q' + ${stat.count}"
+                th:onclick="'showQuestion(' + ${stat.count} + ')'"
+                th:text="'Q' + ${stat.count}">
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+
+
+        <div th:each="question, stat : ${questions}"
+             th:id="'question-' + ${stat.count}"
+             class="question-container"
+             th:style="${stat.count != 1} ? 'display: none;' : 'display: block;'">
+            <p><strong th:text="'Q' + ${stat.count} + '. ' + ${question.question}">Question</strong></p>
+            <ul>
+                <li th:each="choice, idx : ${question.choices}">
+                    <label>
+                        <input type="radio"
+                               th:name="'question_' + ${stat.count}"
+                               th:value="${choice.result}"
+                               required />
+                        <span th:text="${choice.choices}">Choix</span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <div style="text-align: center;">
+            <button type="button" class="submit-btn" onclick="nextQuestion()">Suivant</button>
+            <button type="submit" class="submit-btn" style="display: none;" id="submitFinal">Soumettre</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    let currentQuestion = 1;
+    const totalQuestions = parseInt(document.getElementById("quizForm").getAttribute("data-total"));
+
+    function showQuestion(index) {
+        const clickedNav = document.getElementById("nav-q" + index);
+        if (clickedNav && clickedNav.classList.contains("locked")) return;
+
+        for (let i = 1; i <= totalQuestions; i++) {
+            const q = document.getElementById("question-" + i);
+            const nav = document.getElementById("nav-q" + i);
+            if (q) q.style.display = "none";
+            if (nav) nav.classList.remove("active");
+        }
+
+        const targetQ = document.getElementById("question-" + index);
+        const targetNav = document.getElementById("nav-q" + index);
+        if (targetQ) targetQ.style.display = "block";
+        if (targetNav) targetNav.classList.add("active");
+
+        currentQuestion = index;
+        updateButtons();
+    }
+    function toggleQuestions() {
+        const navList = document.getElementById("navQuestions");
+        const icon = document.getElementById("toggle-icon");
+
+        if (navList.style.display === "none") {
+            navList.style.display = "block";
+            icon.textContent = "˄"; // flèche vers le haut
+        } else {
+            navList.style.display = "none";
+            icon.textContent = "˅"; // flèche vers le bas
+        }
+    }
+    function nextQuestion() {
+        const navItem = document.getElementById("nav-q" + currentQuestion);
+        if (navItem) navItem.classList.add("locked");
+
+        if (currentQuestion < totalQuestions) {
+            showQuestion(currentQuestion + 1);
+        } else {
+            document.querySelector(".submit-btn").style.display = "none";
+            document.getElementById("submitFinal").style.display = "inline-block";
+        }
+    }
+
+    function updateButtons() {
+        if (currentQuestion === totalQuestions) {
+            document.querySelector(".submit-btn").style.display = "none";
+            document.getElementById("submitFinal").style.display = "inline-block";
+        } else {
+            document.querySelector(".submit-btn").style.display = "inline-block";
+            document.getElementById("submitFinal").style.display = "none";
+        }
+    }
+
+    let timeLeft = 120;
+    const countdownEl = document.getElementById("countdown");
+
+    const timer = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            document.getElementById("quizForm").submit();
+        } else {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            timeLeft--;
+        }
+    }, 1000);
+    showQuestion(1);
+    document.getElementById("submitFinal").addEventListener("click", function () {
+        clearInterval(timer); // Stop le timer si l'utilisateur soumet avant la fin
+        document.getElementById("quizForm").submit();
+    });
+
+</script>
+</body>
+</html>
